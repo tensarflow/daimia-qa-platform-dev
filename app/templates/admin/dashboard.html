@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="flex flex-col lg:flex-row gap-12">
+    <!-- Admin Sidebar -->
+    <aside class="lg:w-80 space-y-8">
+        <div class="mb-card p-8">
+            <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                <i class="fas fa-layer-group text-gray-400"></i> New Section
+            </h3>
+            <form action="{{ url_for('add_section') }}" method="POST" class="space-y-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Section Title</label>
+                    <input type="text" name="title" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-black outline-none bg-gray-50/50 text-sm">
+                </div>
+                <button type="submit" class="w-full mb-btn-primary py-3 rounded-xl font-bold text-xs shadow-md">ADD SECTION</button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- Admin Content -->
+    <main class="flex-1 space-y-12">
+        <div class="mb-8">
+            <h2 class="text-4xl font-extrabold text-gray-900 tracking-tight">Configuration Panel</h2>
+            <p class="text-gray-500 mt-2 text-lg italic">Structure the Mercedes-Benz Quality Assurance Catalog</p>
+        </div>
+
+        {% for section in sections %}
+        <div class="mb-card p-10 relative overflow-hidden group">
+            <div class="absolute top-0 left-0 w-2 h-full bg-black"></div>
+            
+            <div class="flex justify-between items-center mb-10">
+                <div class="flex items-center gap-4">
+                    <span class="bg-black text-white w-10 h-10 rounded-xl flex items-center justify-center font-bold font-mono">{{ section.order }}</span>
+                    <h3 class="text-2xl font-bold text-gray-900">{{ section.title }}</h3>
+                </div>
+            </div>
+
+            <!-- Subsections -->
+            <div class="ml-6 space-y-10">
+                {% for sub in section.subsections %}
+                <div class="border-l-2 border-gray-100 pl-8 relative">
+                    <div class="absolute top-0 -left-[1.5px] w-2 h-2 rounded-full bg-gray-300"></div>
+                    
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="text-[10px] font-mono font-bold text-gray-400 bg-gray-50 px-2 py-0.5 rounded">{{ sub.id }}</span>
+                        <h4 class="text-lg font-bold text-gray-800">{{ sub.title }}</h4>
+                    </div>
+
+                    <!-- Questions List -->
+                    <div class="space-y-4 mb-8">
+                        {% for q in sub.questions %}
+                        <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100/50">
+                            <i class="far fa-question-circle text-gray-400 mt-1"></i>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-700">{{ q.text }}</p>
+                                <span class="text-[9px] font-bold text-gray-300 uppercase tracking-widest">{{ q.type }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Add Question to Subsection -->
+                    <form action="{{ url_for('add_question', subsection_id=sub.id) }}" method="POST" class="bg-gray-50/30 p-6 rounded-2xl border-2 border-dashed border-gray-200">
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <input type="text" name="text" placeholder="Enter new question text..." required class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-1 focus:ring-black outline-none text-sm bg-white">
+                            <select name="type" class="px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-1 focus:ring-black outline-none text-xs font-bold bg-white w-full md:w-40">
+                                <option value="yes_no">YES/NO</option>
+                                <option value="text">TEXT</option>
+                                <option value="rating">RATING</option>
+                            </select>
+                            <button type="submit" class="bg-black text-white px-6 py-2.5 rounded-xl font-bold text-xs hover:bg-gray-800 transition-all shrink-0">ADD QUESTION</button>
+                        </div>
+                    </form>
+                </div>
+                {% endfor %}
+
+                <!-- Add Subsection to Section -->
+                <form action="{{ url_for('add_subsection', section_id=section.id) }}" method="POST" class="bg-gray-50 p-6 rounded-2xl border border-gray-100 mt-6">
+                    <div class="flex gap-4">
+                        <input type="text" name="title" placeholder="New Subsection Title" required class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-1 focus:ring-black outline-none text-sm bg-white">
+                        <button type="submit" class="bg-black text-white px-6 py-2.5 rounded-xl font-bold text-xs">ADD SUBSECTION</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </main>
+</div>
+{% endblock %}

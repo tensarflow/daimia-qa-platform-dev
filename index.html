@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAIMIA | Question Catalog v2.1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --daimia-navy: #0F172A;
+            --daimia-blue: #2563EB;
+            --daimia-accent: #38BDF8;
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #F8FAFC;
+            color: #1E293B;
+            scroll-behavior: smooth;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .glass-header {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        @media (min-width: 768px) {
+            .section-card {
+                border-radius: 24px;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            }
+            .section-card:hover {
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+                transform: translateY(-2px);
+            }
+        }
+
+        .question-row {
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-toggle {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+            touch-action: manipulation;
+        }
+
+        .btn-toggle:active {
+            transform: scale(0.95);
+        }
+
+        .active-ja {
+            background-color: #22C55E !important;
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+        }
+
+        .active-nein {
+            background-color: #EF4444 !important;
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 640px) {
+            .btn-toggle {
+                padding: 10px 0 !important;
+                flex: 1;
+                font-size: 13px !important;
+            }
+            .question-text {
+                font-size: 14px !important;
+                line-height: 1.5 !important;
+            }
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Mobile Drawer Trigger -->
+    <div class="lg:hidden fixed bottom-6 right-6 z-[60]">
+        <button onclick="toggleMobileNav()" class="bg-blue-600 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-xl active:scale-90 transition-transform">
+            <i class="fas fa-list-ul"></i>
+        </button>
+    </div>
+
+    <!-- Mobile Navigation Overlay -->
+    <div id="mobile-nav-overlay" onclick="toggleMobileNav()" class="lg:hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[70] hidden opacity-0 transition-opacity duration-300"></div>
+    
+    <!-- Mobile Navigation Menu -->
+    <aside id="mobile-nav-menu" class="lg:hidden fixed top-0 right-0 bottom-0 w-[85%] max-w-sm bg-white z-[80] translate-x-full transition-transform duration-300 ease-in-out shadow-2xl overflow-y-auto p-8">
+        <div class="flex justify-between items-center mb-8">
+            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Navigation</p>
+            <button onclick="toggleMobileNav()" class="text-slate-400 text-xl"><i class="fas fa-times"></i></button>
+        </div>
+        <nav class="space-y-2" id="mobile-sidebar-nav"></nav>
+    </aside>
+
+    <!-- Navigation -->
+    <header class="glass-header sticky top-0 z-50 px-4 md:px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 p-2 rounded-lg shrink-0">
+                    <i class="fas fa-microchip text-white text-lg md:text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-white font-bold text-lg md:text-xl tracking-tight uppercase">Daimia</h1>
+                    <p class="text-slate-400 text-[9px] md:text-[10px] font-semibold uppercase tracking-[0.2em]">Quality Assurance Platform</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-full border border-white/10">
+                    <div class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+                    <span class="text-slate-300 text-[10px] font-medium uppercase tracking-wider">v2.1 Live</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12 flex flex-col lg:flex-row gap-8 md:gap-12">
+        
+        <!-- Desktop Sidebar -->
+        <aside class="lg:w-72 hidden lg:block sticky top-32 h-fit">
+            <nav class="space-y-2" id="sidebar-nav">
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-4 ml-4">Table of Contents</p>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 space-y-8 md:space-y-12">
+            
+            <div class="mb-6 md:mb-8">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Technical Assessment</h2>
+                <p class="text-slate-500 mt-2 text-base md:text-lg">Based on <span class="font-semibold text-slate-700">Fragenkatalog_2.xlsm</span></p>
+            </div>
+
+            <div id="catalog-container" class="space-y-12 md:space-y-16">
+                <!-- Content injected here -->
+            </div>
+        </main>
+    </div>
+
+    <footer class="bg-slate-50 border-t border-slate-200 py-12 mt-24">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col items-center text-center md:flex-row md:justify-between md:text-left gap-8">
+            <div class="flex items-center gap-3 opacity-50">
+                <div class="bg-slate-800 p-1.5 rounded">
+                    <i class="fas fa-microchip text-white text-xs"></i>
+                </div>
+                <span class="font-bold text-slate-800 text-sm tracking-tighter uppercase">Daimia</span>
+            </div>
+            <p class="text-slate-400 text-[10px] md:text-xs">© 2026 DAIMIA Digital Solution and Consulting. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const catalogData = [
+  {
+    "id": "1",
+    "title": "Fahrtzielanzeige",
+    "subsections": [
+      {
+        "id": "1.1",
+        "title": "Steuergerät",
+        "questions": [],
+        "subsections": [
+          {
+            "id": "1.1.1",
+            "title": "Liefergrad",
+            "questions": [
+              "Sind das Fabrikat und das Modell des Geräts vollständig im KSW-Text angegeben?",
+              "Sind die Dokumentationen (HMA-Datenblatt) der KA-Teile vorhanden? ",
+              "Ist die Zertifizierung der KA-Teile vorhanden? (R118, R10 …)",
+              "Falls ein BB-spezifisches Gerät (z. B. FZA Steuergerät oder Router) als KA montiert wird, ist eine Zuordnungsliste erforderlich. Liegt diese vor?"
+            ],
+            "subsections": [
+              { "id": "1.1.1.1", "title": "EBM", "questions": [] },
+              { "id": "1.1.1.2", "title": "LU", "questions": [] },
+              { "id": "1.1.1.3", "title": "KA", "questions": [] }
+            ]
+          },
+          {
+            "id": "1.1.2",
+            "title": "Montage",
+            "questions": ["Gibt es für das Steuergerät im KSW-Text eine Positionsangabe?"],
+            "subsections": []
+          },
+          {
+            "id": "1.1.3",
+            "title": "Ethernet",
+            "questions": [
+              "Funktioniert das Steuegerät over Ethernet?",
+              "Erfüllt das Steuergerät den ITxPT-Standard?"
+            ],
+            "subsections": []
+          }
+        ]
+      },
+      {
+        "id": "1.2",
+        "title": "Anzeige(n)",
+        "subsections": [
+          {
+            "id": "1.2.1",
+            "title": "Liefergrad",
+            "questions": [
+              "Sind das Fabrikat und das Modell des Geräts vollständig im KSW-Text angegeben?",
+              "Sind die Dokumentationen (HMA-Datenblatt) der KA-Teile vorhanden? ",
+              "Ist die Zertifizierung der KA-Teile vorhanden? (R118, R10 …)",
+              "Falls ein BB-spezifisches Gerät (z. B. FZA Steuergerät oder Router) als KA montiert wird, ist eine Zuordnungsliste erforderlich. Liegt diese vor?"
+            ],
+            "subsections": []
+          }
+        ]
+      }
+    ]
+  },
+  { "id": "2", "title": "Innenanzeige", "subsections": [] },
+  { "id": "3", "title": "Entwerter / Kartenleser", "subsections": [] },
+  { "id": "4", "title": "Fahrscheindrucker", "questions": ["Frage 1", "Frage 2"] },
+  { "id": "5", "title": "Bordrechner", "subsections": [] },
+  { "id": "6", "title": "SAE", "subsections": [] },
+  { "id": "7", "title": "Funkanlage", "subsections": [] },
+  { "id": "8", "title": "Router", "subsections": [] },
+  { "id": "9", "title": "Ansagesystem", "subsections": [] },
+  { "id": "10", "title": "Netzwerk", "subsections": [] }
+];
+
+        function toggleMobileNav() {
+            const overlay = document.getElementById('mobile-nav-overlay');
+            const menu = document.getElementById('mobile-nav-menu');
+            if (overlay.classList.contains('hidden')) {
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.add('opacity-100'), 10);
+                menu.classList.remove('translate-x-full');
+                document.body.style.overflow = 'hidden';
+            } else {
+                overlay.classList.remove('opacity-100');
+                menu.classList.add('translate-x-full');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+                document.body.style.overflow = '';
+            }
+        }
+
+        function toggleAnswer(btn, type) {
+            const row = btn.closest('.question-row');
+            const btns = row.querySelectorAll('.btn-toggle');
+            btns.forEach(b => {
+                b.className = 'btn-toggle px-4 py-1.5 md:py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-500 transition-all';
+            });
+            btn.classList.add(type === 'ja' ? 'active-ja' : 'active-nein');
+        }
+
+        function renderQuestions(questions) {
+            if (!questions || questions.length === 0) return '';
+            return `
+                <div class="mt-4 md:mt-6 overflow-hidden bg-slate-50/50 rounded-xl border border-slate-100">
+                    ${questions.map((q, idx) => `
+                        <div class="question-row p-4 md:p-6 flex flex-col gap-4 border-b border-slate-100 last:border-0">
+                            <div class="flex gap-4">
+                                <div class="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+                                    <span class="text-[10px] font-bold text-slate-400">${idx + 1}</span>
+                                </div>
+                                <p class="question-text text-sm font-medium text-slate-700 leading-relaxed">${q}</p>
+                            </div>
+                            <div class="flex gap-2 w-full sm:w-auto sm:ml-auto">
+                                <button onclick="toggleAnswer(this, 'ja')" class="btn-toggle px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-500 w-full sm:w-24">JA</button>
+                                <button onclick="toggleAnswer(this, 'nein')" class="btn-toggle px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-500 w-full sm:w-24">NEIN</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderSubsection(sub, level = 0) {
+            const padding = level > 0 ? 'ml-4 sm:ml-10 border-l-2 border-slate-100 pl-4 sm:pl-6' : '';
+            return `
+                <div class="${padding} mt-8 md:mt-10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-[10px] font-mono font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded">${sub.id}</span>
+                        <h4 class="text-sm md:text-base font-bold text-slate-800">${sub.title}</h4>
+                    </div>
+                    ${renderQuestions(sub.questions)}
+                    ${sub.subsections ? sub.subsections.map(s => renderSubsection(s, level + 1)).join('') : ''}
+                </div>
+            `;
+        }
+
+        const container = document.getElementById('catalog-container');
+        const sidebarNav = document.getElementById('sidebar-nav');
+        const mobileSidebarNav = document.getElementById('mobile-sidebar-nav');
+
+        container.innerHTML = catalogData.map(section => {
+            const itemHtml = `<span class="text-[10px] font-mono opacity-40">${section.id.padStart(2, '0')}</span> ${section.title}`;
+            
+            // Sidebar entries
+            const navLink = document.createElement('a');
+            navLink.href = `#section-${section.id}`;
+            navLink.className = 'sidebar-item flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-all';
+            navLink.innerHTML = itemHtml;
+            sidebarNav.appendChild(navLink);
+
+            const mNavLink = navLink.cloneNode(true);
+            mNavLink.onclick = toggleMobileNav;
+            mobileSidebarNav.appendChild(mNavLink);
+
+            return `
+                <section id="section-${section.id}" class="section-card">
+                    <div class="p-6 md:p-8 border-b border-slate-50 bg-slate-50/30">
+                        <div class="flex items-center gap-4 md:gap-5">
+                            <div class="w-10 h-10 md:w-12 md:h-12 bg-slate-900 text-white rounded-xl md:rounded-2xl flex items-center justify-center font-bold text-lg md:text-xl shadow-lg">
+                                ${section.id}
+                            </div>
+                            <h3 class="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight">${section.title}</h3>
+                        </div>
+                    </div>
+                    <div class="p-6 md:p-8">
+                        ${renderQuestions(section.questions)}
+                        ${section.subsections ? section.subsections.map(sub => renderSubsection(sub)).join('') : ''}
+                        ${(!section.questions?.length && !section.subsections?.length) ? 
+                            '<div class="py-8 text-center bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200"><p class="text-slate-400 text-sm font-medium">No active questions.</p></div>' : ''}
+                    </div>
+                </section>
+            `;
+        }).join('');
+    </script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mercedes-Benz | Quality Assurance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --mb-black: #000000;
+            --mb-silver: #A8A8A8;
+            --mb-dark-grey: #1C1C1C;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #F3F4F6;
+            color: #111827;
+        }
+
+        .mb-gradient {
+            background: linear-gradient(135deg, #000000 0%, #333333 100%);
+        }
+
+        .mb-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 1px solid #E5E7EB;
+        }
+
+        .mb-btn-primary {
+            background-color: #000000;
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .mb-btn-primary:hover {
+            background-color: #333333;
+            transform: translateY(-1px);
+        }
+
+        .active-ja {
+            background-color: #059669 !important;
+            color: white !important;
+        }
+
+        .active-nein {
+            background-color: #DC2626 !important;
+            color: white !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="mb-gradient text-white py-4 px-6 shadow-xl sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <!-- Mercedes Star SVG -->
+                <svg width="40" height="40" viewBox="0 0 512 512" fill="white">
+                    <path d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256s256-114.6 256-256S397.4 0 256 0zM256 464c-114.7 0-208-93.3-208-208S141.3 48 256 48s208 93.3 208 208S370.7 464 256 464zM256 96l-48 128l-128 32l128 32l48 128l48-128l128-32l-128-32L256 96z"/>
+                </svg>
+                <div class="border-l border-white/20 pl-4">
+                    <h1 class="font-bold text-xl tracking-widest uppercase">Mercedes-Benz</h1>
+                    <p class="text-[10px] text-gray-400 font-medium uppercase tracking-[0.3em]">Quality Assurance Platform</p>
+                </div>
+            </div>
+            
+            <nav class="flex items-center gap-6">
+                {% if session.get('user_id') %}
+                    <a href="{{ url_for('index') }}" class="text-sm font-medium hover:text-gray-300">Dashboard</a>
+                    {% if session.get('is_admin') %}
+                        <a href="{{ url_for('admin') }}" class="text-sm font-medium hover:text-gray-300">Admin</a>
+                    {% endif %}
+                    <a href="{{ url_for('logout') }}" class="bg-white/10 px-4 py-2 rounded-lg text-sm font-bold hover:bg-white/20 transition-all">Logout</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl mx-auto w-full px-6 py-12">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-8 rounded shadow-sm">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 py-8">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <p class="text-gray-400 text-xs font-medium uppercase tracking-widest">© 2026 Mercedes-Benz Quality Assurance. Internal Use Only.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
